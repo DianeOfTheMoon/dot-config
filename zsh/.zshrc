@@ -8,7 +8,22 @@ export ZPLUG_BIN=~/bin
 
 source $ZPLUG_HOME/init.zsh
 
+SPACESHIP_PROMPT_ORDER=(
+  dir
+  line_sep
+  dotnet
+  char
+)
+
+SPACESHIP_RPROMPT_ORDER=(
+  git
+  line_sep
+  vi_mode
+  exec_time
+)
+
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
+
 zplug load --verbose
