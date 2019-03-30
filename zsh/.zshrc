@@ -8,6 +8,8 @@ export ZPLUG_BIN=~/bin
 
 source $ZPLUG_HOME/init.zsh
 
+export CLICOLOR=1
+
 SPACESHIP_PROMPT_ORDER=(
   dir
   line_sep
@@ -21,9 +23,13 @@ SPACESHIP_RPROMPT_ORDER=(
   vi_mode
   exec_time
 )
+export TOUCHBAR_GIT_ENABLED=true
+export WD_CONFIG=$XDG_CONFIG_HOME/wd/rc
 
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
-zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
+zplug "iam4x/zsh-iterm-touchbar"
+zplug "mfaerevaag/wd", as:command, use:"wd.sh", hook-load:"wd() { . $ZPLUG_REPOS/mfaerevaag/wd/wd.sh }"
+zplug "denysdovhan/spaceship-prompt", use:"spaceship.zsh", from:github, as:theme
 
 zplug load --verbose
