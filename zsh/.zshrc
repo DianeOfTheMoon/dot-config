@@ -25,6 +25,7 @@ SPACESHIP_RPROMPT_ORDER=(
 )
 export TOUCHBAR_GIT_ENABLED=true
 export WD_CONFIG=$XDG_CONFIG_HOME/wd/rc
+export FZF_DEFAULT_COMMAND='ag --hidden --no-color -l -g ""'
 
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
