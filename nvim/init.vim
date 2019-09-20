@@ -12,8 +12,9 @@ call plug#begin('~/.local/share/nvim/plugged')
   Plug 'editorconfig/editorconfig-vim'
   Plug 'SirVer/ultisnips'
   Plug 'honza/vim-snippets'
-  Plug 'DianeOfTheMoon/OmniSharp-vim'
+  Plug 'DianeOfTheMoon/omnisharp-vim'
   Plug 'dense-analysis/ale'
+  Plug 'wellle/targets.vim'
 call plug#end()
 
 source $CONFIG_DIR/display.vim
