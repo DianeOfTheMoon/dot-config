@@ -9,12 +9,22 @@ call plug#begin('~/.local/share/nvim/plugged')
   Plug '/usr/local/opt/fzf'
   Plug 'junegunn/fzf.vim'
   Plug 'scrooloose/nerdtree'
+  Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
   Plug 'editorconfig/editorconfig-vim'
-  Plug 'SirVer/ultisnips'
   Plug 'honza/vim-snippets'
-  Plug 'DianeOfTheMoon/omnisharp-vim'
-  Plug 'dense-analysis/ale'
   Plug 'wellle/targets.vim'
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+  Plug 'bfrg/vim-cpp-modern'
+  Plug 'liuchengxu/vista.vim'
+  Plug 'tpope/vim-projectionist'
+  Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-surround'
+  Plug 'moll/vim-bbye'
+  Plug 'ryanoasis/vim-devicons'
+  Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile' }
+  Plug 'neoclide/coc-eslint', {'do': 'yarn install --frozen-lockfile' }
+  Plug 'neoclide/coc-snippets', {'do': 'yarn install --frozen-lockfile' }
+  Plug 'josa42/coc-go', {'do': 'yarn install --frozen-lockfile' }
 call plug#end()
 
 source $CONFIG_DIR/display.vim

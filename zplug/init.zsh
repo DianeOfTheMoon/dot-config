@@ -1,1 +1,1 @@
-/Users/diane/.local/share/zplug/repo/zplug/zplug/init.zsh
+/Users/diane/.local/share//zplug/repo/zplug/zplug/init.zsh

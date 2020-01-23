@@ -1,0 +1,8 @@
+tsserver.watchBuild
+tsserver.goToProjectConfig
+tsserver.openTsServerLog
+python.execInTerminal
+python.setInterpreter
+python.runLinting
+python.enableLinting
+list

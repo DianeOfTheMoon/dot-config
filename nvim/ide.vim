@@ -1,59 +1,84 @@
-" ALE Configuration ---
-let g:ale_linters = { 'cs': ['OmniSharp'] }
+autocmd CursorHold * silent call CocActionAsync('highlight')
 
-" Autocomplete ---
-set completeopt=preview,noinsert,menuone,noselect
+" Vista default config
+let g:vista_default_executive = 'coc'
+let g:vista#renderer#enable_icon = 1
 
-" OmniSharp Configuration
-let g:OmniSharp_want_snippet = 1
-let g:OmniSharp_highlight_types = 2
-let g:OmniSharp_server_stdio = 1
-let g:OmniSharp_loglevel = 'debug'
-
+" Global coc config
+let g:coc_extension_root = $XDG_DATA_HOME.'/coc'
+let g:coc_snippet_next = "\<TAB>"
+let g:coc_snippet_prev = "\<S-TAB>"
 
 
-augroup omnisharp_commands
-    autocmd!
+autocmd BufEnter * if bufname('#') =~# "^NERD_tree_" && winnr('$') > 1 | b# | endif
 
-    " Show type information automatically when the cursor stops moving
-    autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+" Remap keys for gotos
+nmap <silent> ;d <Plug>(coc-definition)
+nmap <silent> ;y <Plug>(coc-type-definition)
+nmap <silent> ;i <Plug>(coc-implementation)
+nmap <silent> ;r <Plug>(coc-references)
 
-    " The following commands are contextual, based on the cursor position.
-    autocmd FileType cs nnoremap <buffer> gd :OmniSharpGotoDefinition<CR>
-    autocmd FileType cs nnoremap <buffer> <Leader>fi :OmniSharpFindImplementations<CR>
-    autocmd FileType cs nnoremap <buffer> <Leader>fs :OmniSharpFindSymbol<CR>
-    autocmd FileType cs nnoremap <buffer> <Leader>fu :OmniSharpFindUsages<CR>
+nmap <silent> zj <Plug>(coc-diagnostic-next)
+nmap <silent> zk <Plug>(coc-diagnostic-prev)
 
-    " Finds members in the current buffer
-    autocmd FileType cs nnoremap <buffer> <Leader>fm :OmniSharpFindMembers<CR>
+nmap <leader>f  <Plug>(coc-codeaction)
+xmap f  <Plug>(coc-codeaction-selected)
+nmap f  <Plug>(coc-codeaction-selected)
 
-    autocmd FileType cs nnoremap <buffer> <Leader>fx :OmniSharpFixUsings<CR>
-    autocmd FileType cs nnoremap <buffer> <Leader>tt :OmniSharpTypeLookup<CR>
-    autocmd FileType cs nnoremap <buffer> <Leader>dc :OmniSharpDocumentation<CR>
-    autocmd FileType cs nnoremap <buffer> <C-\> :OmniSharpSignatureHelp<CR>
-    autocmd FileType cs inoremap <buffer> <C-\> <C-o>:OmniSharpSignatureHelp<CR>
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+nnoremap <silent> <TAB> :Vista finder<CR>
 
-    " Navigate up and down by method/property/field
-    autocmd FileType cs nnoremap <buffer> <C-k> :OmniSharpNavigateUp<CR>
-    autocmd FileType cs nnoremap <buffer> <C-j> :OmniSharpNavigateDown<CR>
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
 
-    " Find all code errors/warnings for the current solution and populate the quickfix window
-    autocmd FileType cs nnoremap <buffer> <Leader>cc :OmniSharpGlobalCodeCheck<CR>
-augroup END
+function! s:check_back_space() abort
+    let col = col('.') - 1
+    let retVal = !col || getline('.')[col - 1]  =~ '\s'
+    return retVal
+endfunction
 
-" Contextual code actions (uses fzf, CtrlP or unite.vim when available)
-nnoremap <Leader>ca :OmniSharpGetCodeActions<CR>
-" Run code actions with text selected in visual mode to extract method
-xnoremap <Leader><Space> :call OmniSharp#GetCodeActions('visual')<CR>
+imap <silent><expr> <TAB>
+  \ pumvisible() ? "\<C-n>" :
+  \ <SID>check_back_space() ? "\<TAB>" :
+  \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <expr> <CR> pumvisible() ? "\<C-Y>" : "\<C-g>u\<CR>"
 
-" Rename with dialog
-nnoremap <Leader>nm :OmniSharpRename<CR>
-nnoremap <F2> :OmniSharpRename<CR>
-" Rename without dialog - with cursor on the symbol to rename: `:Rename newname`
-command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
+augroup mygroup
+  autocmd!
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
 
-nnoremap <Leader>cf :OmniSharpCodeFormat<CR>
+autocmd CursorHold * silent call CocActionAsync('highlight')
 
-" Start the omnisharp server for the current solution
-nnoremap <Leader>ss :OmniSharpStartServer<CR>
-nnoremap <Leader>sp :OmniSharpStopServer<CR>
+" floating fzf
+highlight FZFFinder guibg=Gray guifg=Purple
+if has('nvim')
+  let $FZF_DEFAULT_OPTS .= ' --layout=reverse'
+
+  function! FloatingFZF()
+    let height = &lines
+    let width = float2nr(&columns - (&columns * 2 / 10))
+    let col = float2nr((&columns - width) / 2)
+    let col_offset = &columns / 10
+    let opts = {
+          \ 'relative': 'editor',
+          \ 'row': 1,
+          \ 'col': col + col_offset,
+          \ 'width': width * 2 / 1,
+          \ 'height': height / 2,
+          \ 'style': 'minimal'
+          \ }
+    let buf = nvim_create_buf(v:false, v:true)
+    let win = nvim_open_win(buf, v:true, opts)
+    call setwinvar(win, '&winhl', 'FZFFinder')
+  endfunction
+
+  let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+endif
