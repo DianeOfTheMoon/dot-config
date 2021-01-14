@@ -28,12 +28,19 @@ export TOUCHBAR_GIT_ENABLED=true
 export WD_CONFIG=$XDG_CONFIG_HOME/wd/rc
 export FZF_DEFAULT_COMMAND='ag --hidden --no-color -l -g ""'
 
+autoload zmv
+
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
-zplug "iam4x/zsh-iterm-touchbar"
 zplug "mfaerevaag/wd", as:command, use:"wd.sh", hook-load:"wd() { . $ZPLUG_REPOS/mfaerevaag/wd/wd.sh }"
+zplug "zsh-users/zsh-completions", from:github
+zplug "bobthecow/git-flow-completion", from:github
+zplug "plugins/kubectl", from:oh-my-zsh, defer:2
+zplug "bonnefoa/kubectl-fzf", defer:3
 zplug "denysdovhan/spaceship-prompt", use:"spaceship.zsh", from:github, as:theme
 
 zplug load --verbose
+
+zstyle ':completion:*:*:kubectl:*' list-grouped false
 
 eval "$(direnv hook zsh)"

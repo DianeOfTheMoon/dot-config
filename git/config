@@ -10,3 +10,7 @@
 	required = true
 [core]
 	editor = nvim
+[push]
+	default = simple
+[alias]
+	lift = push -u origin HEAD

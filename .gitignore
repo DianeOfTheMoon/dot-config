@@ -1,8 +1,4 @@
 .DS_Store
-coc/extensions
-!coc/extensions/package.json
-coc/mru
-coc/snippets-mru
 gcloud
 zsh/.zsh_history
 helm
