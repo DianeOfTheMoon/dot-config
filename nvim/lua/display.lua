@@ -11,15 +11,20 @@ local function opt(scope, key, value)
 end
 
 
---require('zephyr')
 vim.o.termguicolors = true
 vim.o.background = 'dark'
-vim.g['palenight_terminal_italics'] = 1
-vim.cmd 'colorscheme palenight'
+vim.g['nvim_tree_ignore'] = {'.git', 'node_modules', '.cache', '*.unity', '*.meta'}
+
+require('material').set()
+vim.g.material_style = "palenight"
+vim.g.material_italic_comments = true
+vim.g.material_contrast = true
+
 
 opt('b', 'shiftwidth', 4)
 opt('b', 'tabstop', 4)
 opt('b', 'expandtab', true)
+opt('w', 'signcolumn', 'yes')
 opt('w', 'number', true)
 opt('w', 'relativenumber', true)
 

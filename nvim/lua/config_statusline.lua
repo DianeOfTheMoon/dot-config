@@ -1,9 +1,14 @@
 local gl = require('galaxyline')
 local vcs = require('galaxyline.provider_vcs')
+local lsp_status = require('lsp-status')
+local diagnostics = require('lsp-status/diagnostics')
+local messages = require('lsp-status/messaging')
 local fileinfo = require('galaxyline.provider_fileinfo')
 local sections = gl.section
 local icons = fileinfo.define_file_icon()
-local colors = vim.fn['palenight#GetColors']()
+local condition = require('galaxyline.condition')
+
+gl.short_line_list = {'NvimTree'}
 
 local icon_colors = {
    Brown        = '#905532',
@@ -24,71 +29,134 @@ local icon_colors = {
    LightBlue    = '#5fd7ff',
 }
 
--- Vista needs the autocommand for stuff to show, so do it
-vim.api.nvim_command('autocmd VimEnter * call vista#RunForNearestMethodOrFunction()')
+local copy_group = function(group, invert)
+    local id = vim.fn.synIDtrans(vim.fn.hlID(group))
+    local attrs = {}
+    for _, mode in pairs({'cterm', 'gui'}) do
+        for opposite, layer in pairs({bg = 'fg', fg = 'bg'}) do
+            local output = vim.fn.synIDattr(id, layer, mode)
+            local attrKey = mode..layer
+            if invert == true then
+                attrKey = mode..opposite
+            end
+            if output == nil or output == '' then
+            else
+                attrs[attrKey] = output
+            end
+        end
+    end
+    return attrs
+end
+
+local synth_groups = function(groupTable, invert)
+    local attrs = {}
+    for _, group in pairs(groupTable) do
+        attrs = vim.tbl_extend("force", attrs, copy_group(group, invert))
+    end
+    return attrs
+end
+vim.highlight.create('InvertQuestion', synth_groups({'StatusLine', 'Question'}, true))
+
+local start_bar = {
+    provider = function() return '' end,
+    highlight = 'Question',
+    separator = ' ',
+    separator_highlight = 'InvertQuestion',
+}
+
+local end_bar = {
+    provider = function() return ' ' end,
+    highlight = 'Question',
+}
+
+sections.short_line_left[1] = {
+    Starting = start_bar
+}
+sections.short_line_right[1] = {
+    Ending = end_bar
+}
 
 -- Build it
 sections.left[1] = {
     GitIcon = {
         provider = function() return ' ' end,
-        condition = buffer_not_empty,
+        condition = condition.check_git_workspace,
         highlight = {icon_colors['Orange']},
     },
 }
 sections.left[2] = {
     GitBranch = {
         provider = 'GitBranch',
-        condition = function() return vcs.check_git_workspace() end,
-        highlight = {colors.comment_grey.gui},
+        condition = condition.check_git_workspace,
+        highlight = 'StatusLineNC',
         separator = ' ',
         separator_highlight = {icon_colors.Aqua},
     },
 }
 sections.left[3] = {
     GitAdd = {
-        provider = function() 
-            if vcs.diff_modified() == nil then 
-                    return '~  ' 
-            else 
-                    return vcs.diff_modified() .. ' '
-            end 
-        end,
-        condition = function() return vcs.check_git_workspace() end,
-        highlight = {colors.comment_grey.gui},
-        separator = '',
-        separator_highlight = {colors.purple.gui}
+        provider = 'DiffModified',
+        condition = condition.check_git_workspace,
+        highlight = 'StatusLineNC',
 
     }
 }
 sections.left[4] = {
-    Spacer = {
-        provider = function() return '   ' end,
-        highlight = {colors.special_grey.gui, colors.purple.gui}
-    }
+    Spacer = start_bar
 }
 sections.left[5] = {
-    FileName = {
-        provider = 'FileName',
-        highlight = {colors.special_grey.gui, colors.purple.gui}
+    FileIcon = {
+        provider = 'FileIcon',
+        highlight = 'InvertQuestion',
     }
 }
 sections.left[6] = {
-    GitRem = {
-        provider = 'VistaPlugin',
-        highlight = {colors.special_grey.gui, colors.purple.gui}
+    FileName = {
+        provider = 'FileName',
+        highlight = 'InvertQuestion'
     }
 }
-
+sections.left[7] = {
+    Location = {
+        provider = function()
+            --lsp_status.update_current_function()
+            local output = vim.b.lsp_current_function
+            if output == nil then
+                output = vim.fn['nvim_treesitter#statusline']()
+            end
+            if output == vim.NIL then
+                return 'unknown '
+            end
+            return output .. ' '
+        end,
+        highlight = 'InvertQuestion',
+    }
+}
 sections.right[1] = {
+    LspStatus = {
+        provider = function()
+            return lsp_status.status()
+        end,
+        highlight = 'InvertQuestion'
+    }
+}
+sections.right[2] = {
+    RightSpace = end_bar
+}
+sections.right[3] = {
     LineNums = {
         provider = 'LineColumn',
-        highlight = {colors.special_grey.gui, colors.purple.gui}
+        highlight = 'StatusLineNC',
+        separator = ' ',
     }
 }
 
-sections.right[2] = {
+sections.right[4] = {
     Encoding = {
-        provider = 'FileEncode',
-        highlight = {colors.comment_grey.gui}
+        provider = function()
+            return '['..string.lower(string.gsub(fileinfo.get_file_encode(), "^%s*(.-)%s*$", "%1"))..']'
+        end,
+        highlight = 'StatusLineNC',
+        separator = ' ',
     }
 }
